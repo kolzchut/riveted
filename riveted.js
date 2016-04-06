@@ -18,7 +18,9 @@ var riveted = (function() {
       sendUserTiming,
       reportInterval,
       idleTimeout,
+      userTiming,
       nonInteraction,
+      reportOnce,
       universalGA,
       classicGA,
       universalSendCommand,
@@ -31,6 +33,8 @@ var riveted = (function() {
       options = options || {};
       reportInterval = parseInt(options.reportInterval, 10) || 5;
       idleTimeout = parseInt(options.idleTimeout, 10) || 30;
+      userTiming = typeof(options.userTiming) === "boolean" ? options.userTiming : true;
+      reportOnce = typeof(options.reportOnce) === "boolean" ? options.reportOnce : false;
       gaGlobal = options.gaGlobal || 'ga';
 
       /*
@@ -60,7 +64,7 @@ var riveted = (function() {
         sendEvent = options.eventHandler;
       }
 
-      if (typeof options.userTimingHandler == 'function') {
+      if (typeof options.userTimingHandler === 'function') {
         sendUserTiming = options.userTimingHandler;
       }
 
@@ -138,6 +142,9 @@ var riveted = (function() {
      */
 
     sendUserTiming = function (timingValue) {
+      if ( userTiming === false ) {
+        return;
+      }
 
       if (googleTagManager) {
 
@@ -177,6 +184,10 @@ var riveted = (function() {
           _gaq.push(['_trackEvent', 'Riveted', 'Time Spent', time.toString(), reportInterval, nonInteraction]);
         }
 
+      }
+
+      if ( reportOnce ) {
+        turnOff();
       }
 
     };
