@@ -50,9 +50,13 @@ var riveted = (function() {
         classicGA = true;
       }
 
+      // 2018-05-27 Temporarily disable GTM detection; we have Google Optimize enabled without
+      // GTM, and the combination causes this plugin to malfunction
+      /*
       if (typeof dataLayer !== "undefined" && typeof dataLayer.push === "function") {
         googleTagManager = true;
       }
+      */
 
       if ('gaTracker' in options && typeof options.gaTracker === 'string') {
         universalSendCommand = options.gaTracker + '.send';
