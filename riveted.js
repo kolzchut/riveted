@@ -50,13 +50,9 @@ var riveted = (function() {
         classicGA = true;
       }
 
-      // 2018-05-27 Temporarily disable GTM detection; we have Google Optimize enabled without
-      // GTM, and the combination causes this plugin to malfunction
-      /*
       if (typeof dataLayer !== "undefined" && typeof dataLayer.push === "function") {
         googleTagManager = true;
       }
-      */
 
       if ('gaTracker' in options && typeof options.gaTracker === 'string') {
         universalSendCommand = options.gaTracker + '.send';
@@ -150,20 +146,18 @@ var riveted = (function() {
         return;
       }
 
+      // 2018-11-27 dataLayer or regular analytics - why not both?
+      // The original code only does one or the other, but we want both
       if (googleTagManager) {
-
         dataLayer.push({'event':'RivetedTiming', 'eventCategory':'Riveted', 'timingVar': 'First Interaction', 'timingValue': timingValue});
+      }
 
-      } else {
+      if (universalGA) {
+        window[gaGlobal](universalSendCommand, 'timing', 'Riveted', 'First Interaction', timingValue);
+      }
 
-        if (universalGA) {
-          window[gaGlobal](universalSendCommand, 'timing', 'Riveted', 'First Interaction', timingValue);
-        }
-
-        if (classicGA) {
-          _gaq.push(['_trackTiming', 'Riveted', 'First Interaction', timingValue, null, 100]);
-        }
-
+      if (classicGA) {
+        _gaq.push(['_trackTiming', 'Riveted', 'First Interaction', timingValue, null, 100]);
       }
 
     };
@@ -175,20 +169,17 @@ var riveted = (function() {
     sendEvent = function (time) {
 
       if (googleTagManager) {
-
         dataLayer.push({'event':'Riveted', 'eventCategory':'Riveted', 'eventAction': 'Time Spent', 'eventLabel': time, 'eventValue': reportInterval, 'eventNonInteraction': nonInteraction});
-
-      } else {
-
-        if (universalGA) {
-          window[gaGlobal](universalSendCommand, 'event', 'Riveted', 'Time Spent', time.toString(), reportInterval, {'nonInteraction': nonInteraction});
-        }
-
-        if (classicGA) {
-          _gaq.push(['_trackEvent', 'Riveted', 'Time Spent', time.toString(), reportInterval, nonInteraction]);
-        }
-
       }
+
+      if (universalGA) {
+        window[gaGlobal](universalSendCommand, 'event', 'Riveted', 'Time Spent', time.toString(), reportInterval, {'nonInteraction': nonInteraction});
+      }
+
+      if (classicGA) {
+        _gaq.push(['_trackEvent', 'Riveted', 'Time Spent', time.toString(), reportInterval, nonInteraction]);
+      }
+
 
       if ( reportOnce ) {
         turnOff();
